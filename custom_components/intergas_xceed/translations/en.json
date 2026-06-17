@@ -30,5 +30,17 @@
         }
       }
     }
+  },
+  "services": {
+    "set_schedule": {
+      "name": "Set schedule",
+      "description": "Write the weekly heating schedule (switching times) for a zone.",
+      "fields": {
+        "switchingtimes": {
+          "name": "Switching times",
+          "description": "Flat list of 21 slots (7 days x 3 slots per day) matching the climate entity's 'schedule' attribute. Each slot is either null (no heating period) or an object with 'from' and 'to' hours and an optional 'type' (defaults to 'H')."
+        }
+      }
+    }
   }
 }

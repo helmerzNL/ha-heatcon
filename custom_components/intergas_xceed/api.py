@@ -21,9 +21,11 @@ from .const import (
     ENDPOINT_RESPONSE,
     ENDPOINT_ROOM_LIST,
     ENDPOINT_ROOM_SET_TEMPERATURE,
+    ENDPOINT_ROOM_UPDATE,
     ENDPOINT_SCENE_SET,
     ENDPOINT_SCENE_STATUS,
     ENDPOINT_SWITCHING_TIMES_GET,
+    ENDPOINT_SWITCHING_TIMES_SET,
     ENDPOINT_SYSTEM_STATE,
     ENDPOINT_VERSION,
     ENDPOINT_WEATHER,
@@ -51,6 +53,37 @@ class _Session:
 
     user_id: str
     device_token: str
+
+
+def _normalize_number(value: float) -> float | int:
+    """Return an int when the value is whole, otherwise a 0.1-rounded float."""
+    number = float(value)
+    if number.is_integer():
+        return int(number)
+    return round(number, 1)
+
+
+def _serialize_switching_times(
+    switching_times: list[dict[str, Any] | None],
+) -> str:
+    """Serialize the read-model schedule into the pipe-delimited wire format.
+
+    Each slot becomes ``"{from}-{to}-{type}"`` or an empty string when there is
+    no heating period, and the slots are joined with ``|``.
+    """
+    slots: list[str] = []
+    for slot in switching_times:
+        if not slot:
+            slots.append("")
+            continue
+        start = slot.get("from")
+        end = slot.get("to")
+        slot_type = slot.get("type") or "H"
+        if start is None or end is None:
+            slots.append("")
+            continue
+        slots.append(f"{start}-{end}-{slot_type}")
+    return "|".join(slots)
 
 
 class IntergasXceedApiClient:
@@ -169,6 +202,60 @@ class IntergasXceedApiClient:
         if result.get("success") is False:
             raise IntergasXceedApiError(
                 f"Setting scene {scene} failed: {result.get('message') or 'unknown error'}"
+            )
+
+    async def async_set_room_setpoints(
+        self,
+        room_id: int,
+        name: str,
+        day: float,
+        day2: float | None,
+        night: float,
+    ) -> None:
+        """Update the day/day2/night comfort setpoints for a room/zone.
+
+        The ``/api/room/update`` endpoint requires the room ``name`` (an empty
+        value is rejected) and the full set of setpoints, so callers pass the
+        current values for any setpoint that is not being changed. ``day2`` is
+        omitted for circuits that do not expose a second day setpoint (such as
+        domestic hot water).
+        """
+        payload: dict[str, Any] = {
+            "roomid": int(room_id),
+            "name": name,
+            "desiredTempDay": _normalize_number(day),
+            "desiredTempNight": _normalize_number(night),
+        }
+        if day2 is not None:
+            payload["desiredTempDay2"] = _normalize_number(day2)
+        result = await self._async_signed_request(ENDPOINT_ROOM_UPDATE, payload)
+        if result.get("success") is False:
+            raise IntergasXceedApiError(
+                "Updating the setpoints failed: "
+                f"{result.get('message') or 'unknown error'}"
+            )
+
+    async def async_set_room_schedule(
+        self, room_id: int, switching_times: list[dict[str, Any] | None]
+    ) -> None:
+        """Write the weekly switching schedule for a room/zone.
+
+        ``switching_times`` is the read-model list of 21 slots (7 days x 3
+        slots) as returned by the coordinator: each slot is ``None`` (no
+        heating period) or a mapping with ``from``/``to``/``type`` keys. The
+        endpoint expects a single pipe-delimited string instead of JSON.
+        """
+        result = await self._async_signed_request(
+            ENDPOINT_SWITCHING_TIMES_SET,
+            {
+                "roomid": int(room_id),
+                "switchingtimes": _serialize_switching_times(switching_times),
+            },
+        )
+        if result.get("success") is False:
+            raise IntergasXceedApiError(
+                "Updating the schedule failed: "
+                f"{result.get('message') or 'unknown error'}"
             )
 
     # ------------------------------------------------------------------

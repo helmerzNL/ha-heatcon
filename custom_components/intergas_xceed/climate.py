@@ -13,14 +13,25 @@ from homeassistant.components.climate import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+import voluptuous as vol
 
-from .const import DOMAIN
+from .const import DOMAIN, SERVICE_SET_SCHEDULE
 from .coordinator import IntergasXceedDataUpdateCoordinator, XceedRoom
 from .entity import IntergasXceedEntity
 
 DEFAULT_MIN_TEMP = 5.0
 DEFAULT_MAX_TEMP = 35.0
+
+SCHEDULE_SLOT_SCHEMA = vol.Any(
+    None,
+    {
+        vol.Required("from"): vol.Coerce(int),
+        vol.Required("to"): vol.Coerce(int),
+        vol.Optional("type", default="H"): cv.string,
+    },
+)
 
 
 async def async_setup_entry(
@@ -30,6 +41,18 @@ async def async_setup_entry(
 ) -> None:
     """Set up the climate entities."""
     coordinator: IntergasXceedDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+
+    platform = entity_platform.async_get_current_platform()
+    platform.async_register_entity_service(
+        SERVICE_SET_SCHEDULE,
+        {
+            vol.Required("switchingtimes"): vol.All(
+                cv.ensure_list, [SCHEDULE_SLOT_SCHEMA]
+            )
+        },
+        "async_set_schedule",
+    )
+
     async_add_entities(
         IntergasXceedClimate(coordinator, room.id)
         for room in coordinator.data.rooms
@@ -131,5 +154,19 @@ class IntergasXceedClimate(IntergasXceedEntity, ClimateEntity):
             return
         await self.coordinator.api.async_set_room_temperature(
             self._room_id, float(temperature)
+        )
+        await self.coordinator.async_request_refresh()
+
+    async def async_set_schedule(
+        self, switchingtimes: list[dict[str, Any] | None]
+    ) -> None:
+        """Write the weekly switching schedule for this zone.
+
+        ``switchingtimes`` is the flat 21-slot list (7 days x 3 slots) matching
+        the ``schedule`` state attribute: each slot is ``None`` or a mapping
+        with ``from``/``to``/``type`` keys.
+        """
+        await self.coordinator.api.async_set_room_schedule(
+            self._room_id, switchingtimes
         )
         await self.coordinator.async_request_refresh()

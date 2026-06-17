@@ -30,5 +30,17 @@
         }
       }
     }
+  },
+  "services": {
+    "set_schedule": {
+      "name": "Schema instellen",
+      "description": "Schrijf het wekelijkse verwarmingsschema (schakeltijden) voor een zone.",
+      "fields": {
+        "switchingtimes": {
+          "name": "Schakeltijden",
+          "description": "Platte lijst van 21 sloten (7 dagen x 3 sloten per dag) die overeenkomt met het 'schedule'-attribuut van de climate-entiteit. Elk slot is null (geen verwarmingsperiode) of een object met 'from'- en 'to'-uren en een optioneel 'type' (standaard 'H')."
+        }
+      }
+    }
   }
 }

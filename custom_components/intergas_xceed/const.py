@@ -21,6 +21,7 @@ CONF_SCAN_INTERVAL: Final = "scan_interval"
 PLATFORMS: Final[list[Platform]] = [
     Platform.CLIMATE,
     Platform.WATER_HEATER,
+    Platform.NUMBER,
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
     Platform.SWITCH,
@@ -34,10 +35,15 @@ ENDPOINT_VERSION: Final = "/api/version"
 ENDPOINT_ROOM_LIST: Final = "/api/room/list"
 ENDPOINT_ROOM_SET_TEMPERATURE: Final = "/api/room/settemperature"
 ENDPOINT_SWITCHING_TIMES_GET: Final = "/api/room/switchingtimes/get"
+ENDPOINT_SWITCHING_TIMES_SET: Final = "/api/room/switchingtimes/set"
+ENDPOINT_ROOM_UPDATE: Final = "/api/room/update"
 ENDPOINT_SCENE_STATUS: Final = "/api/scene/status"
 ENDPOINT_SCENE_SET: Final = "/api/scene/set"
 ENDPOINT_SYSTEM_STATE: Final = "/api/systemstate"
 ENDPOINT_WEATHER: Final = "/api/weather"
+
+# Custom Home Assistant services.
+SERVICE_SET_SCHEDULE: Final = "set_schedule"
 
 # Scenes are the heatapp! operating modes (Party, Boost, ...).
 SCENE_DEFAULT_DURATIONS: Final[dict[str, int]] = {

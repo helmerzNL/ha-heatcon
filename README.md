@@ -46,9 +46,11 @@ Why:
 3. **Entities**
    - Climate: one entity per heating zone with a writable target temperature
    - Water heater: the domestic hot water (DHW) circuit with a writable setpoint
+   - Number: writable day/day2/night comfort setpoints per heating zone
    - Sensors: per-room actual/desired/day/night temperatures, outdoor temperature, system status, active modes
    - Binary sensors: cooling, window, comfort mode, and a system problem indicator
    - Switches: one per heatapp! scene (Party, Boost, Holiday, Shower, Leave, Standby, Towel)
+   - Service: `intergas_xceed.set_schedule` to write a zone's weekly switching times
 
 4. **Diagnostics**
    - API version and device information
@@ -72,7 +74,7 @@ Why:
 ## Current status
 
 - The login, signature flow, and the live runtime `/api/*` endpoints used by the heatapp! app/web UI are confirmed against a real device.
-- Reads (rooms, scenes, system state, weather, schedules) and writes (zone/DHW target temperature, scene activation) are implemented and verified.
+- Reads (rooms, scenes, system state, weather, schedules) and writes (zone/DHW target temperature, day/day2/night setpoints, weekly schedules, scene activation) are implemented and verified.
 - The domestic hot water circuit requires `change_mode=1` on a temperature write; heating zones use `change_mode=0`. Both are handled automatically.
 
 ## Repository status
@@ -84,7 +86,8 @@ Included:
 - Home Assistant manifest and config flow
 - API client with the confirmed login/signature flow and AES device-token decryption
 - Polling data update coordinator with a typed device model
-- Climate, water heater, sensor, binary sensor, and switch platforms backed by the live API
+- Climate, water heater, number, sensor, binary sensor, and switch platforms backed by the live API
+- A `set_schedule` service for writing weekly switching times
 - Diagnostics export
 - English and Dutch translations
 
@@ -103,7 +106,5 @@ This repository includes:
 
 ## Short-term roadmap
 
-1. Expose writable day/night/day2 setpoints once a stable write endpoint is confirmed.
-2. Add writable weekly schedules (currently read-only, surfaced as attributes).
-3. Map any remaining app/web configurable fields to `number`/`select`/`button` platforms.
-4. Add tests and CI.
+1. Map any remaining app/web configurable fields to `number`/`select`/`button` platforms.
+2. Add tests and CI.

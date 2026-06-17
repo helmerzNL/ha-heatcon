@@ -1,0 +1,13 @@
+set_schedule:
+  target:
+    entity:
+      integration: intergas_xceed
+      domain: climate
+  fields:
+    switchingtimes:
+      required: true
+      example: >-
+        [{"from": 6, "to": 22, "type": "H"}, null, null, {"from": 6, "to": 22,
+        "type": "H"}, null, null]
+      selector:
+        object:
