@@ -1,5 +1,9 @@
 # ha-intergas-xceed
 
+<p align="center">
+  <img src="./icon.png" alt="Intergas XCeed logo" width="180">
+</p>
+
 Intergas XCeed Heatpump investigation and Home Assistant integration strategy.
 
 [![Open your Home Assistant instance and add this repository in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=helmerzNL&repository=ha-intergas-xceed&category=integration)

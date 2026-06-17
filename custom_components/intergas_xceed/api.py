@@ -75,6 +75,7 @@ class IntergasXceedApiClient:
             "network": await self.async_admin_request("/admin/network/info"),
             "datetime": await self.async_admin_request("/admin/datetime/get"),
             "portal": await self.async_admin_request("/admin/portal/get"),
+            "parameter_check": await self.async_admin_request("/admin/parameter/check"),
             "parameter_progress": await self.async_admin_request("/admin/parameter/progress"),
         }
 

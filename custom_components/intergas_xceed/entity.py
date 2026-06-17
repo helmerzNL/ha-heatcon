@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from typing import Iterator
 from typing import Any
 
 from homeassistant.helpers.device_registry import DeviceInfo
@@ -71,3 +73,58 @@ def _nested_value(payload: dict[str, Any], path: tuple[str, ...]) -> Any | None:
             return None
         current = current[key]
     return current
+
+
+def iter_leaf_paths(payload: Mapping[str, Any]) -> list[tuple[tuple[str, ...], Any]]:
+    """Return all scalar leaf values from a nested payload."""
+    return list(_iter_leaf_paths(payload, ()))
+
+
+def path_to_name(path: tuple[str, ...]) -> str:
+    """Convert a payload path into a readable entity name."""
+    return " ".join(segment.replace("_", " ").replace("-", " ") for segment in path).title()
+
+
+def path_to_object_id(path: tuple[str, ...]) -> str:
+    """Convert a payload path into a stable object id suffix."""
+    return "_".join(segment.replace("-", "_").lower() for segment in path)
+
+
+def resolve_path_value(payload: Any, path: tuple[str, ...]) -> Any | None:
+    """Resolve a nested path against mappings and lists."""
+    current: Any = payload
+    for key in path:
+        if isinstance(current, Mapping):
+            if key not in current:
+                return None
+            current = current[key]
+            continue
+        if isinstance(current, list):
+            try:
+                current = current[int(key)]
+            except (ValueError, IndexError):
+                return None
+            continue
+        return None
+    return current
+
+
+def _iter_leaf_paths(
+    value: Any,
+    path: tuple[str, ...],
+) -> Iterator[tuple[tuple[str, ...], Any]]:
+    """Yield scalar leaf values from nested mappings and lists."""
+    if isinstance(value, Mapping):
+        for key, nested_value in value.items():
+            if key.lower() in {"success", "message", "performance", "loginrejected"}:
+                continue
+            yield from _iter_leaf_paths(nested_value, (*path, str(key)))
+        return
+
+    if isinstance(value, list):
+        for index, nested_value in enumerate(value):
+            yield from _iter_leaf_paths(nested_value, (*path, str(index)))
+        return
+
+    if path:
+        yield (path, value)
