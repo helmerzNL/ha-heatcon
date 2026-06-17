@@ -5,6 +5,7 @@ from __future__ import annotations
 from base64 import b64decode
 from dataclasses import dataclass
 from hashlib import md5, sha256
+import json
 import logging
 from typing import Any
 
@@ -162,12 +163,22 @@ class IntergasXceedApiClient:
                 json=payload,
                 timeout=REQUEST_TIMEOUT,
             ) as response:
-                response.raise_for_status()
-                data = await response.json(content_type=None)
+                response_text = await response.text()
         except ClientError as err:
-            raise IntergasXceedApiError(f"Request to {path} failed") from err
-        except ValueError as err:
-            raise IntergasXceedApiError(f"Request to {path} did not return JSON") from err
+            raise IntergasXceedApiError(f"Request to {path} failed: {err}") from err
+
+        if response.status >= 400:
+            raise IntergasXceedApiError(
+                f"Request to {path} failed with HTTP {response.status}: "
+                f"{_summarize_response_text(response_text)}"
+            )
+
+        try:
+            data = json.loads(response_text)
+        except json.JSONDecodeError as err:
+            raise IntergasXceedApiError(
+                f"Request to {path} did not return valid JSON: {_summarize_response_text(response_text)}"
+            ) from err
 
         if not isinstance(data, dict):
             raise IntergasXceedApiError(f"Request to {path} returned a non-object payload")
@@ -241,3 +252,11 @@ def _normalize_signature_value(value: Any) -> str:
     if isinstance(value, bool):
         return "true" if value else "false"
     return str(value)
+
+
+def _summarize_response_text(response_text: str, limit: int = 200) -> str:
+    """Return a compact single-line snippet for loggable response bodies."""
+    compact = " ".join(response_text.split())
+    if len(compact) <= limit:
+        return compact
+    return f"{compact[:limit]}..."

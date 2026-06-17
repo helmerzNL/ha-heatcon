@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import voluptuous as vol
@@ -18,6 +19,8 @@ from .api import (
     IntergasXceedInvalidAuthError,
 )
 from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL, DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class IntergasXceedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -48,9 +51,19 @@ class IntergasXceedConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 await api.async_test_connection()
-            except IntergasXceedInvalidAuthError:
+            except IntergasXceedInvalidAuthError as err:
+                _LOGGER.warning(
+                    "Intergas XCeed authentication failed for host %s: %s",
+                    user_input[CONF_HOST],
+                    err,
+                )
                 errors["base"] = "invalid_auth"
-            except IntergasXceedApiError:
+            except IntergasXceedApiError as err:
+                _LOGGER.exception(
+                    "Unable to connect to Intergas XCeed at host %s: %s",
+                    user_input[CONF_HOST],
+                    err,
+                )
                 errors["base"] = "cannot_connect"
             else:
                 options = {
