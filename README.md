@@ -111,7 +111,9 @@ Native `time` entities for the switching schedule, one picker per weekday:
   granularity, matching the boiler menu).
 
 Set them straight from a dashboard; values are snapped to the granularity the
-controller supports before being written.
+controller supports before being written. If you prefer time‑picker helpers for
+your dashboard, see [`examples/`](./examples) for an optional package that mirrors
+these `time` entities to `input_datetime` helpers and keeps them in two‑way sync.
 
 ### Sensors
 
@@ -149,3 +151,14 @@ in one call. Target a zone's `climate` entity and pass `switchingtimes`, a flat
 The integration supports Home Assistant's **Download diagnostics** button on the
 device page, which exports the API version and the latest (redacted) payload for
 troubleshooting.
+
+## Examples
+
+The [`examples/`](./examples) folder contains optional, copy‑paste Home Assistant
+configuration that builds on top of the integration:
+
+- **`examples/packages/heatcon_schedule.yaml`** - recreates 28 `input_datetime`
+  time‑picker helpers (one per schedule `time` entity) plus two automations that
+  keep the helpers and the native `time` entities in two‑way sync. Handy for
+  dashboards. See [`examples/README.md`](./examples/README.md) for setup and the
+  prefixes you need to adjust for your install.
