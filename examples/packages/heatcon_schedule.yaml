@@ -1,0 +1,311 @@
+# HeatCon schedule helpers - reproducible example config (option 2)
+#
+# This package recreates the 28 `input_datetime` time helpers and the two
+# sync automations that keep them in two-way sync with the integration's
+# native `time.*` schedule entities. The helpers are dashboard-friendly
+# time pickers; the integration's own `time.*` entities remain the source
+# of truth and snap every value to the controller grid (DHW = 10 minutes,
+# room = whole hour).
+#
+# HOW TO USE
+#   1. Enable packages once in configuration.yaml:
+#        homeassistant:
+#          packages: !include_dir_named packages
+#   2. Copy this file to <config>/packages/heatcon_schedule.yaml
+#   3. Check configuration and restart Home Assistant.
+#
+# IMPORTANT - adjust the entity prefixes to YOUR install
+#   The `time.*` entity ids below are derived from the device name and room
+#   name. On this reference install they are:
+#       time.berging_intergas_xceed_domestic_hot_water_<weekday>_comfort_start|end
+#       time.berging_intergas_xceed_room_1_<weekday>_day_start|night_start
+#   If your device/room slug differs, find & replace these two prefixes
+#   throughout this file (they appear in the trigger lists and in the
+#   `target` variable of each automation):
+#       time.berging_intergas_xceed_domestic_hot_water_
+#       time.berging_intergas_xceed_room_1_
+#   Tip: Developer Tools -> States, filter on `time.` to find your ids.
+
+input_datetime:
+  heatcon_dhw_monday_comfort_start:
+    name: HeatCon DHW Monday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_monday_comfort_end:
+    name: HeatCon DHW Monday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "20:00:00"
+  heatcon_dhw_tuesday_comfort_start:
+    name: HeatCon DHW Tuesday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_tuesday_comfort_end:
+    name: HeatCon DHW Tuesday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "22:00:00"
+  heatcon_dhw_wednesday_comfort_start:
+    name: HeatCon DHW Wednesday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_wednesday_comfort_end:
+    name: HeatCon DHW Wednesday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "20:00:00"
+  heatcon_dhw_thursday_comfort_start:
+    name: HeatCon DHW Thursday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_thursday_comfort_end:
+    name: HeatCon DHW Thursday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "22:00:00"
+  heatcon_dhw_friday_comfort_start:
+    name: HeatCon DHW Friday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_friday_comfort_end:
+    name: HeatCon DHW Friday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "22:00:00"
+  heatcon_dhw_saturday_comfort_start:
+    name: HeatCon DHW Saturday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_saturday_comfort_end:
+    name: HeatCon DHW Saturday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "22:00:00"
+  heatcon_dhw_sunday_comfort_start:
+    name: HeatCon DHW Sunday comfort start
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "11:00:00"
+  heatcon_dhw_sunday_comfort_end:
+    name: HeatCon DHW Sunday comfort end
+    has_date: false
+    has_time: true
+    icon: mdi:clock-outline
+    initial: "22:00:00"
+  heatcon_room_1_monday_day_start:
+    name: HeatCon Room 1 Monday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "11:00:00"
+  heatcon_room_1_monday_night_start:
+    name: HeatCon Room 1 Monday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+  heatcon_room_1_tuesday_day_start:
+    name: HeatCon Room 1 Tuesday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "06:00:00"
+  heatcon_room_1_tuesday_night_start:
+    name: HeatCon Room 1 Tuesday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+  heatcon_room_1_wednesday_day_start:
+    name: HeatCon Room 1 Wednesday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "06:00:00"
+  heatcon_room_1_wednesday_night_start:
+    name: HeatCon Room 1 Wednesday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+  heatcon_room_1_thursday_day_start:
+    name: HeatCon Room 1 Thursday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "06:00:00"
+  heatcon_room_1_thursday_night_start:
+    name: HeatCon Room 1 Thursday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+  heatcon_room_1_friday_day_start:
+    name: HeatCon Room 1 Friday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "06:00:00"
+  heatcon_room_1_friday_night_start:
+    name: HeatCon Room 1 Friday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+  heatcon_room_1_saturday_day_start:
+    name: HeatCon Room 1 Saturday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "04:00:00"
+  heatcon_room_1_saturday_night_start:
+    name: HeatCon Room 1 Saturday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+  heatcon_room_1_sunday_day_start:
+    name: HeatCon Room 1 Sunday day start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-sunny
+    initial: "06:00:00"
+  heatcon_room_1_sunday_night_start:
+    name: HeatCon Room 1 Sunday night start
+    has_date: false
+    has_time: true
+    icon: mdi:weather-night
+    initial: "22:00:00"
+
+automation:
+  - id: heatcon_schedule_push_helper_to_time_entity
+    alias: HeatCon schedule - push helper to time entity
+    description: >-
+      When a HeatCon input_datetime helper changes, write its time to the
+      matching HeatCon time entity (which snaps it to the controller grid).
+    mode: parallel
+    max: 60
+    variables:
+      val: "{{ trigger.to_state.state }}"
+      target: >-
+        {{ trigger.entity_id
+           | replace('input_datetime.heatcon_dhw_', 'time.berging_intergas_xceed_domestic_hot_water_')
+           | replace('input_datetime.heatcon_room_1_', 'time.berging_intergas_xceed_room_1_') }}
+    triggers:
+      - trigger: state
+        entity_id:
+          - input_datetime.heatcon_dhw_monday_comfort_start
+          - input_datetime.heatcon_dhw_monday_comfort_end
+          - input_datetime.heatcon_dhw_tuesday_comfort_start
+          - input_datetime.heatcon_dhw_tuesday_comfort_end
+          - input_datetime.heatcon_dhw_wednesday_comfort_start
+          - input_datetime.heatcon_dhw_wednesday_comfort_end
+          - input_datetime.heatcon_dhw_thursday_comfort_start
+          - input_datetime.heatcon_dhw_thursday_comfort_end
+          - input_datetime.heatcon_dhw_friday_comfort_start
+          - input_datetime.heatcon_dhw_friday_comfort_end
+          - input_datetime.heatcon_dhw_saturday_comfort_start
+          - input_datetime.heatcon_dhw_saturday_comfort_end
+          - input_datetime.heatcon_dhw_sunday_comfort_start
+          - input_datetime.heatcon_dhw_sunday_comfort_end
+          - input_datetime.heatcon_room_1_monday_day_start
+          - input_datetime.heatcon_room_1_monday_night_start
+          - input_datetime.heatcon_room_1_tuesday_day_start
+          - input_datetime.heatcon_room_1_tuesday_night_start
+          - input_datetime.heatcon_room_1_wednesday_day_start
+          - input_datetime.heatcon_room_1_wednesday_night_start
+          - input_datetime.heatcon_room_1_thursday_day_start
+          - input_datetime.heatcon_room_1_thursday_night_start
+          - input_datetime.heatcon_room_1_friday_day_start
+          - input_datetime.heatcon_room_1_friday_night_start
+          - input_datetime.heatcon_room_1_saturday_day_start
+          - input_datetime.heatcon_room_1_saturday_night_start
+          - input_datetime.heatcon_room_1_sunday_day_start
+          - input_datetime.heatcon_room_1_sunday_night_start
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ val not in ['unknown', 'unavailable']
+             and not is_state(target, 'unavailable')
+             and states(target) != val }}
+    actions:
+      - action: time.set_value
+        target:
+          entity_id: "{{ target }}"
+        data:
+          time: "{{ val }}"
+  - id: heatcon_schedule_pull_time_entity_to_helper
+    alias: HeatCon schedule - pull time entity to helper
+    description: >-
+      When a HeatCon time entity changes (e.g. after a poll or external
+      change), update the matching input_datetime helper so it always
+      reflects the controller value.
+    mode: parallel
+    max: 60
+    variables:
+      val: "{{ trigger.to_state.state }}"
+      target: >-
+        {{ trigger.entity_id
+           | replace('time.berging_intergas_xceed_domestic_hot_water_', 'input_datetime.heatcon_dhw_')
+           | replace('time.berging_intergas_xceed_room_1_', 'input_datetime.heatcon_room_1_') }}
+    triggers:
+      - trigger: state
+        entity_id:
+          - time.berging_intergas_xceed_domestic_hot_water_monday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_monday_comfort_end
+          - time.berging_intergas_xceed_domestic_hot_water_tuesday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_tuesday_comfort_end
+          - time.berging_intergas_xceed_domestic_hot_water_wednesday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_wednesday_comfort_end
+          - time.berging_intergas_xceed_domestic_hot_water_thursday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_thursday_comfort_end
+          - time.berging_intergas_xceed_domestic_hot_water_friday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_friday_comfort_end
+          - time.berging_intergas_xceed_domestic_hot_water_saturday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_saturday_comfort_end
+          - time.berging_intergas_xceed_domestic_hot_water_sunday_comfort_start
+          - time.berging_intergas_xceed_domestic_hot_water_sunday_comfort_end
+          - time.berging_intergas_xceed_room_1_monday_day_start
+          - time.berging_intergas_xceed_room_1_monday_night_start
+          - time.berging_intergas_xceed_room_1_tuesday_day_start
+          - time.berging_intergas_xceed_room_1_tuesday_night_start
+          - time.berging_intergas_xceed_room_1_wednesday_day_start
+          - time.berging_intergas_xceed_room_1_wednesday_night_start
+          - time.berging_intergas_xceed_room_1_thursday_day_start
+          - time.berging_intergas_xceed_room_1_thursday_night_start
+          - time.berging_intergas_xceed_room_1_friday_day_start
+          - time.berging_intergas_xceed_room_1_friday_night_start
+          - time.berging_intergas_xceed_room_1_saturday_day_start
+          - time.berging_intergas_xceed_room_1_saturday_night_start
+          - time.berging_intergas_xceed_room_1_sunday_day_start
+          - time.berging_intergas_xceed_room_1_sunday_night_start
+    conditions:
+      - condition: template
+        value_template: >-
+          {{ val not in ['unknown', 'unavailable']
+             and states(target) != val }}
+    actions:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: "{{ target }}"
+        data:
+          time: "{{ val }}"
